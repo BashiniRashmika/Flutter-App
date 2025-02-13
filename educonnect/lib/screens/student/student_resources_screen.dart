@@ -24,12 +24,28 @@ class StudentResourcesScreen extends StatelessWidget {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Learning Resources'),
+          title: const Text('Learning Resources',
+              style: TextStyle(fontWeight: FontWeight.bold)),
+          flexibleSpace: Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Color.fromARGB(255, 32, 52, 126),
+                  Color.fromARGB(255, 75, 102, 159)
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+            ),
+          ),
           bottom: const TabBar(
+            indicatorColor: Colors.white,
+            labelColor: Colors.white,
+            unselectedLabelColor: Colors.white70,
             tabs: [
-              Tab(text: 'Articles'),
-              Tab(text: 'Videos'),
-              Tab(text: 'Tips'),
+              Tab(icon: Icon(Icons.article), text: 'Articles'),
+              Tab(icon: Icon(Icons.video_library), text: 'Videos'),
+              Tab(icon: Icon(Icons.lightbulb), text: 'Tips'),
             ],
           ),
         ),
@@ -53,11 +69,22 @@ class StudentResourcesScreen extends StatelessWidget {
       itemBuilder: (context, index) {
         final resource = filteredResources[index];
         return Card(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          elevation: 4,
           margin: const EdgeInsets.only(bottom: 16),
           child: ListTile(
-            title: Text(resource.title),
+            contentPadding: const EdgeInsets.all(16),
+            leading: CircleAvatar(
+              backgroundColor: const Color.fromARGB(255, 56, 100, 211),
+              child: Icon(_getIconForType(resource.type), color: Colors.white),
+            ),
+            title: Text(resource.title,
+                style: const TextStyle(fontWeight: FontWeight.bold)),
             subtitle: Text(resource.description),
-            trailing: Icon(_getIconForType(resource.type)),
+            trailing: const Icon(Icons.chevron_right,
+                color: Color.fromARGB(255, 54, 98, 172)),
             onTap: () {
               // Navigate to resource detail screen
             },

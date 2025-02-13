@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import '../../models/user.dart';
 
 class CreateLessonScreen extends StatefulWidget {
   @override
@@ -19,138 +18,143 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Lesson'),
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.all(16),
-          children: [
-            TextFormField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                labelText: 'Lesson Title',
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a title';
-                }
-                return null;
-              },
+        title: const Text('Create Lesson',
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                Color.fromARGB(255, 19, 52, 175),
+                Color.fromARGB(255, 84, 96, 191)
+              ],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
             ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedSubject,
-              decoration: const InputDecoration(
-                labelText: 'Subject',
-                border: OutlineInputBorder(),
-              ),
-              items: ['Mathematics', 'Science', 'English', 'History']
-                  .map((subject) => DropdownMenuItem(
-                        value: subject,
-                        child: Text(subject),
-                      ))
-                  .toList(),
-              onChanged: (value) {
+          ),
+        ),
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildTextField(_titleController, 'Lesson Title', Icons.title),
+              const SizedBox(height: 16),
+              _buildDropdown(
+                  'Subject',
+                  ['Mathematics', 'Science', 'English', 'History'],
+                  _selectedSubject, (value) {
                 setState(() {
                   _selectedSubject = value!;
                 });
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _descriptionController,
-              decoration: const InputDecoration(
-                labelText: 'Description',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 2,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter a description';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            TextFormField(
-              controller: _contentController,
-              decoration: const InputDecoration(
-                labelText: 'Lesson Content',
-                border: OutlineInputBorder(),
-              ),
-              maxLines: 10,
-              validator: (value) {
-                if (value?.isEmpty ?? true) {
-                  return 'Please enter lesson content';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            DropdownButtonFormField<String>(
-              value: _selectedLanguage,
-              decoration: const InputDecoration(
-                labelText: 'Language',
-                border: OutlineInputBorder(),
-              ),
-              items: ['English', 'Spanish', 'French', 'German']
-                  .map((language) => DropdownMenuItem(
-                        value: language,
-                        child: Text(language),
-                      ))
-                  .toList(),
-              onChanged: (value) {
+              }),
+              const SizedBox(height: 16),
+              _buildTextField(
+                  _descriptionController, 'Description', Icons.description,
+                  maxLines: 2),
+              const SizedBox(height: 16),
+              _buildTextField(
+                  _contentController, 'Lesson Content', Icons.article,
+                  maxLines: 10),
+              const SizedBox(height: 16),
+              _buildDropdown(
+                  'Language',
+                  ['English', 'Spanish', 'French', 'German'],
+                  _selectedLanguage, (value) {
                 setState(() {
                   _selectedLanguage = value!;
                 });
-              },
-            ),
-            const SizedBox(height: 16),
-            ElevatedButton.icon(
-              onPressed: _addAttachment,
-              icon: const Icon(Icons.attach_file),
-              label: const Text('Add Attachment'),
-            ),
-            if (_attachments.isNotEmpty) ...[
+              }),
               const SizedBox(height: 16),
-              Card(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Padding(
-                      padding: EdgeInsets.all(8.0),
-                      child: Text(
-                        'Attachments',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                    ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: _attachments.length,
-                      itemBuilder: (context, index) {
-                        return ListTile(
-                          title: Text(_attachments[index]),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.delete),
-                            onPressed: () => _removeAttachment(index),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+              ElevatedButton.icon(
+                onPressed: _addAttachment,
+                icon: const Icon(Icons.attach_file),
+                label: const Text('Add Attachment'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(255, 116, 164, 253),
+                  foregroundColor: Colors.white,
                 ),
               ),
-            ],
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _submitLesson,
-              child: const Text('Create Lesson'),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
+              if (_attachments.isNotEmpty) _buildAttachments(),
+              const SizedBox(height: 24),
+              ElevatedButton(
+                onPressed: _submitLesson,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  foregroundColor: Colors.white,
+                  minimumSize: const Size(double.infinity, 48),
+                ),
+                child:
+                    const Text('Create Lesson', style: TextStyle(fontSize: 18)),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField(
+      TextEditingController controller, String label, IconData icon,
+      {int maxLines = 1}) {
+    return TextFormField(
+      controller: controller,
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      maxLines: maxLines,
+      validator: (value) =>
+          (value?.isEmpty ?? true) ? 'Please enter $label' : null,
+    );
+  }
+
+  Widget _buildDropdown(String label, List<String> items, String selectedValue,
+      Function(String?) onChanged) {
+    return DropdownButtonFormField<String>(
+      value: selectedValue,
+      decoration: InputDecoration(
+        labelText: label,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+      items: items
+          .map((item) => DropdownMenuItem(value: item, child: Text(item)))
+          .toList(),
+      onChanged: onChanged,
+    );
+  }
+
+  Widget _buildAttachments() {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Attachments',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _attachments.length,
+              itemBuilder: (context, index) {
+                return ListTile(
+                  title: Text(_attachments[index]),
+                  trailing: IconButton(
+                    icon: const Icon(Icons.delete, color: Colors.red),
+                    onPressed: () => _removeAttachment(index),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -159,7 +163,6 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
   }
 
   void _addAttachment() {
-    // Implement file attachment logic
     setState(() {
       _attachments.add('Sample_attachment_${_attachments.length + 1}.pdf');
     });
@@ -173,7 +176,6 @@ class _CreateLessonScreenState extends State<CreateLessonScreen> {
 
   void _submitLesson() {
     if (_formKey.currentState?.validate() ?? false) {
-      // Implement lesson creation logic
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Lesson created successfully!')),
       );

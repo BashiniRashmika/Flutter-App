@@ -9,8 +9,37 @@ class LessonScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(lesson.title),
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.blueAccent, Colors.lightBlue],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildLessonDetailsCard(lesson, context),
+            const SizedBox(height: 24),
+            _buildLessonContent(lesson.content),
+            const SizedBox(height: 24),
+            _buildTakeQuizButton(context, lesson.id),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLessonDetailsCard(Lesson lesson, BuildContext context) {
+    return Card(
+      elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -19,59 +48,74 @@ class LessonScreen extends StatelessWidget {
               lesson.subject,
               style: TextStyle(
                 fontSize: 18,
+                fontWeight: FontWeight.bold,
                 color: Theme.of(context).primaryColor,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               lesson.description,
-              style: const TextStyle(
-                fontSize: 16,
-                color: Colors.grey,
-              ),
+              style: const TextStyle(fontSize: 16, color: Colors.grey),
             ),
-            const SizedBox(height: 24),
-            const Text(
-              'Content',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              lesson.content,
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Points: ${lesson.points}',
-                  style: TextStyle(
-                    color: Theme.of(context).primaryColor,
-                  ),
+                Chip(
+                  label: Text('Points: ${lesson.points}'),
+                  backgroundColor: Colors.blue.shade100,
                 ),
-                Text(
-                  'Language: ${lesson.language}',
-                  style: const TextStyle(color: Colors.grey),
+                Chip(
+                  label: Text('Language: ${lesson.language}'),
+                  backgroundColor: Colors.green.shade100,
                 ),
               ],
             ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => Navigator.pushNamed(
-                context,
-                '/quiz',
-                arguments: lesson.id,
-              ),
-              style: ElevatedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-              ),
-              child: const Text('Take Quiz'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLessonContent(String content) {
+    return Card(
+      elevation: 2,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Lesson Content',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              content,
+              style: const TextStyle(fontSize: 16),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTakeQuizButton(BuildContext context, String lessonId) {
+    return Center(
+      child: ElevatedButton(
+        onPressed: () =>
+            Navigator.pushNamed(context, '/quiz', arguments: lessonId),
+        style: ElevatedButton.styleFrom(
+          minimumSize: const Size(double.infinity, 48),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          elevation: 5,
+          backgroundColor: const Color.fromARGB(255, 33, 78, 155),
+        ),
+        child: const Text(
+          'Take Quiz',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
       ),
     );
